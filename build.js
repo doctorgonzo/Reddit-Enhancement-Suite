@@ -42,6 +42,11 @@ const targets = {
 		manifest: './firefox/manifest.json',
 		noSourcemap: true,
 	},
+	safari: {
+		browserName: 'safari',
+		browserMinVersion: '16.4',
+		manifest: './safari/manifest.json',
+	},
 }
 
 const options = commander.program
@@ -90,6 +95,11 @@ async function buildForBrowser(targetName, { manifest, noSourceMap, browserName,
 		bundle: true,
 		format: 'iife',
 		treeShaking: true,
+		...(browserName === 'safari' ? {
+			banner: {
+				js: 'if(typeof globalThis.requestIdleCallback!=="function"){globalThis.requestIdleCallback=function(cb){return setTimeout(function(){cb({didTimeout:false,timeRemaining:function(){return 50}})},1)};globalThis.cancelIdleCallback=function(id){clearTimeout(id)}}',
+			},
+		} : {}),
 		metafile: true,
 		target: [`${browserName}${browserMinVersion}`],
 		loader: {
@@ -99,6 +109,7 @@ async function buildForBrowser(targetName, { manifest, noSourceMap, browserName,
 			'.woff': 'dataurl',
 		},
 		define: {
+			...(browserName === 'safari' ? { 'global': 'globalThis' } : {}),
 			'process.env.BUILD_TARGET': `"${browserName}"`,
 			'process.env.NODE_ENV': `"${options.mode}"`,
 			'process.env.buildToken': `"${buildToken}"`,
@@ -164,7 +175,24 @@ async function buildForBrowser(targetName, { manifest, noSourceMap, browserName,
 						return { contents: text, loader: 'copy' };
 					});
 				},
-			}, options.zip ? {
+			}, browserName === 'safari' ? {
+				name: 'strip-unsafe-eval',
+				setup(build) {
+					build.onEnd(async () => {
+						const dir = `./dist/${targetName}/`;
+						const files = await fs.promises.readdir(dir);
+						for (const file of files.filter(f => f.endsWith('.js'))) {
+							const filePath = path.join(dir, file);
+							let content = await fs.promises.readFile(filePath, 'utf8');
+							if (content.includes('Function("return this")()')) {
+								content = content.replaceAll('Function("return this")()', 'globalThis');
+								await fs.promises.writeFile(filePath, content);
+								console.log(`stripped unsafe Function() from ${file}`);
+							}
+						}
+					});
+				},
+			} : undefined, options.zip ? {
 				name: 'zip-build',
 				setup(build) {
 					const sourceDir = `./dist/${targetName}/`;
