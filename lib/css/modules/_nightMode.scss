@@ -1757,3 +1757,382 @@ $title-link-visited-color: hsl(0, 0%, 65%);
 		background-color: #202020;
 	}
 }
+
+// ============================================================
+// Shreddit (new Reddit web components) night mode
+//
+// Variable names below are mapped from Reddit's actual design system
+// (389 color properties discovered via runtime diagnostic).
+// ============================================================
+
+$nm-surface:       #000000;                  // pure OLED black — 0 power draw on OLED
+$nm-surface-raise: #111111;                  // raised cards / containers
+$nm-surface-hover: #1a1a1a;                  // hover / active states
+$nm-header:        #0a0a0a;                  // header bar — near-black
+$nm-input:         #1a1a1a;                  // input fields
+
+.res-d2x-nightmode {
+	color-scheme: dark !important;
+	background-color: $nm-surface !important;
+	color: $color !important;
+
+	// ==== CSS custom property overrides ====
+	// Set on body so they cascade to all descendants and override :root.
+
+	// ---- Neutral surfaces ----
+	--color-neutral-background:                    #{$nm-surface};
+	--color-neutral-background-weak:               #{darken($nm-surface, 3%)};
+	--color-neutral-background-hover:              #{$nm-surface-raise};
+	--color-neutral-background-medium:             #{darken($nm-surface, 2%)};
+	--color-neutral-background-strong:             #{$nm-surface-raise};
+	--color-neutral-background-strong-hover:       #{$nm-surface-hover};
+	--color-neutral-background-selected:           #{$nm-surface-hover};
+	--color-neutral-background-canvas:             #{$nm-surface-hover};
+	--color-neutral-background-container:          #{$nm-surface-raise};
+	--color-neutral-background-container-hover:    #{$nm-surface-hover};
+	--color-neutral-background-container-strong:   #{$nm-surface-raise};
+	--color-neutral-background-container-strong-hover: #{$nm-surface-hover};
+	--color-neutral-background-highlighted:        #{$nm-surface-raise};
+	--color-neutral-background-highlighted-strong: #{$nm-surface-hover};
+	--color-neutral-background-gilded:             #{$nm-surface-raise};
+	--color-neutral-background-gilded-hover:       #{$nm-surface-hover};
+	--color-neutral-background-pinned:             #{darken($nm-surface, 4%)};
+	--color-neutral-background-weak-hover:         #{$nm-surface};
+
+	// ---- Neutral content ----
+	--color-neutral-content:          #{$color};
+	--color-neutral-content-weak:     #888;
+	--color-neutral-content-strong:   #{$title-link-color};
+	--color-neutral-content-disabled: #555;
+
+	// ---- Neutral borders ----
+	--color-neutral-border:        #222;
+	--color-neutral-border-weak:   #181818;
+	--color-neutral-border-medium: #2a2a2a;
+	--color-neutral-border-strong: #333;
+	--color-divider-default:       #181818;
+
+	// ---- Primary / links ----
+	--color-primary:                     #{$link-color};
+	--color-primary-weak:                #{$link-color};
+	--color-primary-hover:               #90a9fd;
+	--color-primary-content:             #{$link-color};
+	--color-primary-plain:               #{$link-color};
+	--color-primary-plain-hover:         #90a9fd;
+	--color-primary-plain-visited:       #cf5fff;
+	--color-primary-visited:             #cf5fff;
+	--color-primary-background:          #{darken($nm-surface, 2%)};
+	--color-primary-background-hover:    #{$link-color};
+	--color-primary-background-selected: #{$link-color};
+	--color-primary-onBackground:        #fff;
+	--color-primary-border:              #{$link-color};
+	--color-primary-border-hover:        #90a9fd;
+
+	// ---- Link elements ----
+	--color-a-default: #{$link-color};
+	--color-a-hover:   #90a9fd;
+	--color-a-visited: #{$title-link-visited-color};
+
+	// ---- Secondary ----
+	--color-secondary:                       #d7dadc;
+	--color-secondary-weak:                  #888;
+	--color-secondary-background:            #{$nm-surface-hover};
+	--color-secondary-background-hover:      #{lighten($nm-surface-hover, 5%)};
+	--color-secondary-background-selected:   #{lighten($nm-surface-hover, 8%)};
+	--color-secondary-content:               #{$color};
+	--color-secondary-onBackground:          #fff;
+	--color-secondary-plain:                 #d7dadc;
+	--color-secondary-plain-hover:           #fff;
+	--color-secondary-plain-weak:            #888;
+
+	// ---- Buttons ----
+	--button-color-background-default:   #{$nm-surface-hover};
+	--button-color-background-hover:     #{lighten($nm-surface-hover, 5%)};
+	--button-color-background-activated: #{lighten($nm-surface-hover, 10%)};
+	--button-color-background-active:    linear-gradient(#{lighten($nm-surface-hover, 5%)}, #{lighten($nm-surface-hover, 5%)});
+	--button-color-background-focus:     #{$nm-surface-hover};
+	--button-color-text-default:         #fff;
+	--button-color-text-activated:       #fff;
+	--button-border-color-default:       transparent;
+	--color-button-plain-text:           #d7dadc;
+	--color-button-plain-text-hover:     #fff;
+	--color-button-plain-text-weak:      #888;
+	--color-button-plain-background-hover:     #{$nm-surface-hover};
+	--color-button-plain-background-activated: #{lighten($nm-surface-hover, 5%)};
+	--color-button-secondary-background:       #{$nm-surface-hover};
+	--color-button-secondary-background-hover: #{lighten($nm-surface-hover, 5%)};
+	--color-button-secondary-text:             #fff;
+	--color-button-tertiary-background:        transparent;
+	--color-button-tertiary-background-hover:  #{$nm-surface-hover};
+	--color-button-tertiary-text:              #{$title-link-color};
+
+	// ---- Inputs ----
+	--color-input-default:        #{$nm-input};
+	--color-input-text:           #{$title-link-color};
+	--color-input-hover:          #{$link-color};
+	--color-input-helper-text:    #888;
+	--color-input-border:         transparent;
+	--color-input-secondary:      #{$nm-surface-hover};
+	--color-input-secondary-text: #fff;
+	--color-input-radio:          #888;
+
+	// ---- Tooltips ----
+	--color-tooltip-bg-neutral:   #{$nm-surface-raise};
+	--color-tooltip-text-neutral: #{$color};
+	--color-tooltip-bg-inverted:  #{$color};
+	--color-tooltip-text-inverted: #{$nm-surface};
+
+	// ---- Global ----
+	--color-global-bg:         #{$nm-surface};
+	--color-global-content-bg: #{$nm-surface-raise};
+	--color-global-header-bg:  #{$nm-header};
+	--color-ui-canvas:         #{darken($nm-surface, 5%)};
+	--color-ui-modalbackground: #{$nm-surface-raise};
+
+	// ---- Shreddit-specific ----
+	--shreddit-content-background:       #{$nm-surface};
+	--shreddit-content-background-hover: #{$nm-surface-hover};
+	--styled-scrollbar-background:       #{$nm-surface};
+
+	// ---- Tones (relative gray scale, dark→light) ----
+	--color-tone-1: #{$title-link-color};
+	--color-tone-2: #{$color};
+	--color-tone-3: #555;
+	--color-tone-4: #444;
+	--color-tone-5: #333;
+	--color-tone-6: #222;
+	--color-tone-7: #{$nm-surface-raise};
+
+	// ---- Misc ----
+	--color-scrim-background:        rgba(0,0,0,.75);
+	--color-scrim-background-strong: rgba(0,0,0,.9);
+	--color-shimmer-background: rgba(255,255,255,.02);
+	--loader-color: #ccc;
+	--color-label-default: #777;
+
+	// ==== Direct element overrides (fallback for Tailwind utility classes) ====
+
+	shreddit-app {
+		background-color: $nm-surface !important;
+		color: $color !important;
+	}
+
+	main, [role="main"] {
+		background-color: $nm-surface !important;
+	}
+
+	// ---- Header ----
+	reddit-header-large {
+		background-color: $nm-header !important;
+		border-bottom-color: #1a1a1a !important;
+
+		reddit-search-large input {
+			background-color: $nm-input !important;
+			color: $color !important;
+			&::placeholder { color: #666 !important; }
+		}
+	}
+
+	reddit-header-action-items {
+		background-color: $nm-header !important;
+	}
+
+	// ---- Posts ----
+	shreddit-post {
+		background-color: $nm-surface-raise !important;
+		border-color: #1a1a1a !important;
+		color: $color !important;
+
+		h1, [slot="title"], a[slot="title"] { color: $title-link-color !important; }
+		a[slot="title"]:visited, h1 a:visited { color: $title-link-visited-color !important; }
+
+		[slot="text-body"], shreddit-post-text-body, .md {
+			color: $color !important;
+			a { color: $link-color; }
+			a:visited { color: $title-link-visited-color; }
+			pre, code { background-color: $nm-input !important; color: $color !important; }
+			blockquote { border-left-color: $border-color !important; color: #888 !important; }
+		}
+
+		[slot="credit-bar"], [data-testid="post-credit-bar"] {
+			color: #888 !important;
+			a { color: $link-color !important; }
+		}
+	}
+
+	// ---- Comments ----
+	shreddit-comment {
+		color: $color !important;
+
+		.md, [slot="comment-body"] {
+			color: $color !important;
+			a { color: $link-color; }
+			pre, code { background-color: $nm-input !important; color: $color !important; }
+		}
+	}
+
+	// ---- Sidebar ----
+	aside, [role="complementary"] {
+		background-color: $nm-surface !important;
+		color: $color !important;
+	}
+
+	// ---- Inputs ----
+	input[type="text"], input[type="search"], input[type="url"],
+	input[type="email"], input[type="number"], textarea, select {
+		background-color: $nm-input !important;
+		color: $color !important;
+		border-color: #222 !important;
+		&::placeholder { color: #666 !important; }
+	}
+
+	// ---- Dropdowns / menus ----
+	faceplate-dropdown-menu, [role="menu"], [role="listbox"] {
+		background-color: $nm-surface-raise !important;
+		color: $color !important;
+		border-color: #1a1a1a !important;
+
+		[role="menuitem"], [role="option"] {
+			color: $color !important;
+			&:hover { background-color: $nm-surface-hover !important; }
+		}
+	}
+
+	// ---- Dialogs / tooltips / hovercards ----
+	rpl-tooltip { background-color: $nm-surface-raise !important; color: $color !important; }
+	rpl-dialog-sheet, [role="dialog"] { background-color: $nm-surface-raise !important; color: $color !important; }
+	faceplate-hovercard { background-color: $nm-surface-raise !important; color: $color !important; }
+
+	// ---- Loaders ----
+	faceplate-loader, faceplate-partial, shreddit-async-loader {
+		color: inherit !important;
+	}
+
+	// ---- Comment page containers ----
+	// Comment pages have extra wrappers that carry their own bg color.
+	shreddit-comment-tree {
+		background-color: $nm-surface !important;
+	}
+
+	// Post detail / thread wrappers
+	[data-testid="post-container"],
+	[data-testid="comment-tree"],
+	[data-testid="comments-page-layout"] {
+		background-color: $nm-surface !important;
+	}
+
+	// Generic wrappers on comment pages
+	shreddit-app > div,
+	main > div,
+	[id*="comment"],
+	[id*="Comment"] {
+		background-color: $nm-surface !important;
+	}
+
+	// Faceplate & layout containers
+	faceplate-batch, faceplate-tracker, faceplate-screen {
+		background-color: transparent !important;
+	}
+
+	// Thread / comment tree lines
+	shreddit-comment-tree-ad {
+		background-color: $nm-surface !important;
+	}
+
+	// Separators / dividers
+	hr {
+		border-color: #181818 !important;
+		background-color: #181818 !important;
+	}
+
+	// Catch-all: any element that Reddit's CSS sets to a grey-ish bg
+	// via style attributes or computed vars.
+	[style*="background-color"],
+	[style*="background:"] {
+		// Can't override inline styles without !important on specific selectors,
+		// but the CSS var overrides above should handle most cases.
+	}
+
+	// ---- More aggressive bg overrides for nested containers ----
+	// Reddit comment pages use deeply nested divs with explicit bg colors
+	shreddit-app,
+	shreddit-app > *,
+	main > *,
+	[role="main"] > * {
+		&:not(shreddit-post):not(shreddit-comment):not(reddit-header-large):not(reddit-header-action-items) {
+			background-color: $nm-surface !important;
+		}
+	}
+
+	// Sort menus / tab-like navigation
+	[role="tablist"] {
+		background-color: $nm-surface !important;
+		border-color: #222 !important;
+
+		[role="tab"] {
+			color: $color !important;
+
+			&[aria-selected="true"] {
+				color: $title-link-color !important;
+			}
+		}
+	}
+
+	// Reddit ads — dim them in night mode
+	shreddit-sidebar-ad {
+		opacity: 0.6;
+	}
+
+	// ---- Code / preformatted text (global) ----
+	pre, code {
+		background-color: $nm-surface-raise !important;
+		color: $color !important;
+	}
+
+	// ---- Tables ----
+	table {
+		border-color: #222 !important;
+		color: $color !important;
+
+		th {
+			background-color: $nm-surface-raise !important;
+			border-color: #222 !important;
+			color: $color !important;
+		}
+
+		td {
+			border-color: #1a1a1a !important;
+		}
+
+		tr:nth-child(even) {
+			background-color: rgba(255, 255, 255, 0.02) !important;
+		}
+	}
+
+	// ---- Scrollbar (WebKit / Safari) ----
+	::-webkit-scrollbar {
+		background-color: $nm-surface;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background-color: #333;
+		border-radius: 4px;
+
+		&:hover {
+			background-color: #444;
+		}
+	}
+
+	// ---- Override Tailwind utility background classes ----
+	// Shreddit uses Tailwind JIT classes like bg-[color:var(--sh...)]
+	// These have high specificity; we need !important to override them.
+	[class*="bg-neutral"],
+	[class*="bg-secondary"] {
+		background-color: $nm-surface !important;
+	}
+
+	[class*="text-neutral"],
+	[class*="text-secondary"] {
+		color: $color !important;
+	}
+}
