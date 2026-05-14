@@ -868,6 +868,13 @@ html[res-warning]::before {
 		top: 14px;
 		z-index: 100;
 	}
+
+	&-shredditNavbar {
+		position: fixed;
+		right: 12px;
+		top: 12px;
+		z-index: 100;
+	}
 }
 
 body.res-dashboard {
