@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building RES for Safari</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f7f7f5;
+      --bg-info: #e6f1fb;
+      --bg-warning: #faeeda;
+      --bg-danger: #fcebeb;
+      --bg-success: #eaf3de;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-tertiary: #999999;
+      --text-info: #0c447c;
+      --text-warning: #854f0b;
+      --text-danger: #791f1f;
+      --text-success: #27500a;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Menlo, monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a1a;
+        --bg-secondary: #2a2a2a;
+        --bg-info: #0c447c;
+        --bg-warning: #412402;
+        --bg-danger: #501313;
+        --bg-success: #173404;
+        --text: #e8e8e8;
+        --text-secondary: #a0a0a0;
+        --text-tertiary: #707070;
+        --text-info: #85b7eb;
+        --text-warning: #fac775;
+        --text-danger: #f09595;
+        --text-success: #c0dd97;
+        --border: rgba(255,255,255,0.12);
+        --border-hover: rgba(255,255,255,0.25);
+      }
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 3rem 1.5rem;
+    }
+
+    .guide {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .prereqs {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .prereqs h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .prereqs ul {
+      list-style: none;
+    }
+
+    .prereqs li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .prereqs li .icon {
+      width: 20px;
+      text-align: center;
+      color: var(--text-info);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .prereqs code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 0.5px solid var(--border);
+    }
+
+    .steps {
+      position: relative;
+    }
+
+    .step {
+      border-left: 2px solid var(--border);
+      margin-left: 14px;
+      padding: 0 0 2rem 28px;
+      position: relative;
+    }
+
+    .step:last-child {
+      border-left-color: transparent;
+      padding-bottom: 0;
+    }
+
+    .step-num {
+      position: absolute;
+      left: -15px;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-info);
+      color: var(--text-info);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-num.done {
+      background: var(--bg-success);
+      color: var(--text-success);
+    }
+
+    .time {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      padding: 2px 8px;
+      margin-bottom: 4px;
+    }
+
+    .step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      line-height: 1.65;
+    }
+
+    .cmd {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      margin: 8px 0 12px;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    .cmd .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .cmd:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .cmd .copy-btn:hover {
+      background: var(--bg-secondary);
+      border-color: var(--border-hover);
+    }
+
+    .note {
+      background: var(--bg-warning);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text-warning);
+      margin: 10px 0;
+      line-height: 1.55;
+    }
+
+    .danger {
+      background: var(--bg-danger);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text-danger);
+      margin: 10px 0;
+      line-height: 1.55;
+    }
+
+    .success {
+      background: var(--bg-success);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text-success);
+      margin: 10px 0;
+      line-height: 1.55;
+    }
+
+    .section {
+      margin-top: 2rem;
+      border-top: 0.5px solid var(--border);
+      padding-top: 1.5rem;
+    }
+
+    .section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .section p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 8px;
+    }
+
+    .section ul {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .footer {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2.5rem;
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    a { color: var(--text-info); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="guide">
+    <h1>Building RES for Safari</h1>
+    <p class="subtitle">
+      Reddit Enhancement Suite now supports Safari as a build target. Since Safari Web Extensions
+      require an Apple Developer account ($99/year) for distribution, the only way to run it right now
+      is building from source. This guide walks you through it &mdash; takes about 10 minutes.
+    </p>
+
+    <div class="prereqs">
+      <h2>Before you start</h2>
+      <ul>
+        <li><span class="icon">&#9654;</span> macOS 13 (Ventura) or later</li>
+        <li><span class="icon">&#9654;</span> <a href="https://apps.apple.com/us/app/xcode/id497799835">Xcode 15+</a> (free from the Mac App Store)</li>
+        <li><span class="icon">&#9654;</span> Node.js 18+ &mdash; <code>node -v</code> to check</li>
+        <li><span class="icon">&#9654;</span> Yarn package manager &mdash; <code>npm install -g yarn</code> if needed</li>
+        <li><span class="icon">&#9654;</span> Safari 16.4 or later (ships with macOS Ventura+)</li>
+        <li><span class="icon">&#9654;</span> Git &mdash; <code>git --version</code> to check</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <span class="time">~2 min</span>
+        <h3>Clone the repo and install dependencies</h3>
+        <p>Clone the fork that has Safari support, switch to the <code>safari-support</code> branch, and install the project dependencies.</p>
+        <div class="cmd">git clone https://github.com/doctorgonzo/Reddit-Enhancement-Suite.git
+cd Reddit-Enhancement-Suite
+git checkout safari-support
+yarn install<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <span class="time">~30 sec</span>
+        <h3>Build the Safari extension</h3>
+        <p>Run the build script targeting Safari. This compiles all the source code and outputs the extension to <code>dist/safari/</code>.</p>
+        <div class="cmd">npx node build.js --browsers safari<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <span class="time">~1 min</span>
+        <h3>Generate the Xcode project</h3>
+        <p>Apple requires Safari extensions to be wrapped in a native macOS app. This command auto-generates the Xcode project from the built extension files.</p>
+        <div class="cmd">xcrun safari-web-extension-converter dist/safari/ \
+  --project-location ./xcode \
+  --app-name "Reddit Enhancement Suite" \
+  --bundle-identifier com.res.reddit-enhancement-suite \
+  --no-open<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+        <div class="note"><strong>Note:</strong> You only need to run this once. After the Xcode project exists, subsequent JS rebuilds (step 2) are picked up automatically &mdash; just re-run step 4.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <span class="time">~2 min</span>
+        <h3>Build the macOS app</h3>
+        <p>Build the wrapper app using Xcode's command-line tools. The signing flags let you build without an Apple Developer account.</p>
+        <div class="cmd">xcodebuild \
+  -project "xcode/Reddit Enhancement Suite/Reddit Enhancement Suite.xcodeproj" \
+  -scheme "Reddit Enhancement Suite (macOS)" \
+  -configuration Debug \
+  build \
+  CODE_SIGN_IDENTITY="-" \
+  CODE_SIGNING_REQUIRED=NO<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+        <p>When it finishes, look for <strong>BUILD SUCCEEDED</strong> in the output.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <span class="time">~30 sec</span>
+        <h3>Launch the app</h3>
+        <p>Open the built app to register the extension with Safari.</p>
+        <div class="cmd">open "$(find ~/Library/Developer/Xcode/DerivedData \
+  -name 'Reddit Enhancement Suite.app' \
+  -path '*/Debug/*' \
+  | head -1)"<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+        <p>A small app window will appear &mdash; you can close it. The extension is now registered with Safari.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <span class="time">~1 min</span>
+        <h3>Enable the extension in Safari</h3>
+        <p>Two things need to happen in Safari:</p>
+        <p>
+          <strong>A. Enable unsigned extensions:</strong><br>
+          Open Safari &rarr; menu bar &rarr; <strong>Develop</strong> &rarr; <strong>Allow Unsigned Extensions</strong>
+        </p>
+        <p style="font-size:13px;color:var(--text-tertiary);margin-top:-4px;">
+          If you don't see the Develop menu: Safari &rarr; Settings &rarr; Advanced &rarr; check "Show features for web developers"
+        </p>
+        <p>
+          <strong>B. Turn on the extension:</strong><br>
+          Safari &rarr; <strong>Settings</strong> &rarr; <strong>Extensions</strong> &rarr; check the box next to <strong>Reddit Enhancement Suite</strong>
+        </p>
+        <div class="danger"><strong>Important:</strong> "Allow Unsigned Extensions" resets every time you quit Safari. You'll need to re-enable it each session.</div>
+      </div>
+
+      <div class="step" style="border-left-color:transparent;">
+        <div class="step-num done">&#10003;</div>
+        <h3>You're done!</h3>
+        <p>Navigate to <a href="https://old.reddit.com">old.reddit.com</a> and you should see the RES gear icon in the toolbar. Click it to access RES settings.</p>
+        <div class="success"><strong>Troubleshooting:</strong> If something isn't working, open Safari's Web Inspector (Develop &rarr; Show Web Inspector) and check the console for errors. Please report issues on the <a href="https://github.com/doctorgonzo/Reddit-Enhancement-Suite/issues">GitHub Issues</a> page.</div>
+      </div>
+
+    </div>
+
+    <div class="section">
+      <h2>Rebuilding after code changes</h2>
+      <p>If you make changes to the RES source code, you only need to repeat steps 2 and 4. The Xcode project picks up the new JS files automatically:</p>
+      <div class="cmd">npx node build.js --browsers safari
+
+xcodebuild \
+  -project "xcode/Reddit Enhancement Suite/Reddit Enhancement Suite.xcodeproj" \
+  -scheme "Reddit Enhancement Suite (macOS)" \
+  -configuration Debug \
+  build \
+  CODE_SIGN_IDENTITY="-" \
+  CODE_SIGNING_REQUIRED=NO<span class="copy-btn" onclick="copyCmd(this)" role="button" tabindex="0">Copy</span></div>
+    </div>
+
+    <div class="section">
+      <h2>Known limitations</h2>
+      <ul>
+        <li>Private browsing detection is disabled (Safari doesn't expose this to extensions)</li>
+        <li>OAuth login uses a popup window flow instead of background auth</li>
+        <li>The locale dictionary (~150KB) is bundled in the foreground script rather than loaded via messaging</li>
+        <li>Some media expandos may not work yet &mdash; testing is ongoing</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Why can't I just download the extension?</h2>
+      <p>
+        Apple requires all Safari extensions to be distributed through the Mac App Store or as notarized apps,
+        both of which require a paid Apple Developer account ($99/year). Until we have that, building from source
+        is the only option. The upside: you get to run the latest code and help us test.
+      </p>
+    </div>
+
+    <p class="footer">
+      Reddit Enhancement Suite v5.24.8 &middot; Safari Web Extension Port &middot; 2026<br>
+      <a href="https://github.com/doctorgonzo/Reddit-Enhancement-Suite">GitHub</a> &middot;
+      <a href="https://redditenhancementsuite.com">redditenhancementsuite.com</a>
+    </p>
+  </div>
+
+  <script>
+    function copyCmd(btn) {
+      const block = btn.parentElement;
+      const text = block.textContent.replace('Copy', '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+  </script>
+</body>
+</html>
